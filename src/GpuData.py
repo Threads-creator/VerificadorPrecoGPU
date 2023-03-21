@@ -13,14 +13,18 @@ class Gpu:
     price: float
     lowestPrice = 99999
     dateLowestPrice: str
+    store: str
+    link: str
 
-    def __init__(self, name, fhdPerf, qhdPerf, price = 0.0, lowestPrice = 99999.0, dateLowestPrice = ""):
+    def __init__(self, name, fhdPerf = 0.0, qhdPerf = 0.0, price = 0.0, lowestPrice = 99999.0, dateLowestPrice = "", store="", link=""):
         self.name = name
         self.fhdPerf = fhdPerf
         self.qhdPerf = qhdPerf
         self.price = price
         self.lowestPrice = lowestPrice
         self.dateLowestPrice = dateLowestPrice
+        self.store = store
+        self.link = link
 
 
     def __str__(self) -> str:
@@ -194,44 +198,59 @@ def __sortGpusLists():
     gpusFromSite.sort(key=operator.attrgetter('name'))
 
 
+def __convertJsonToGpuClass(gpus):
+
+    convertedGpus = [] * len(gpus)
+
+    for gpu in gpus:
+        tempGpu = Gpu(name = gpu["ModeloSimplificado"])
+        tempGpu.price=gpu["ValorAV"]
+        tempGpu.store = gpu["Loja"]
+        tempGpu.link = gpu["Link"]
+
+        convertedGpus.append(tempGpu)
+
+    return convertedGpus
+
+
 def getGpusPrice():
 
     __sortGpusLists()
 
-    return gpusLowestValue
+    return __convertJsonToGpuClass(gpusLowestValue)
 
 
 def getGpusAllData():
-    
-    __sortGpusLists()
 
+    gpusLowestValue = getGpusPrice();
     gpusFinalResult = [] * len(gpusLowestValue)
 
-    for aux in gpusLowestValue:
+    for lowValueGpu in gpusLowestValue:
         
         for gpu in gpusFromSite:
 
             gpuName = gpu.name[gpu.name.find(' ') + 1::].replace(' ', '').upper()
             
-            if gpuName.upper() == aux['ModeloSimplificado'].replace(' ', '').upper():
+            if gpuName.upper() == lowValueGpu.name.replace(' ', '').upper():
 
-                auxGpu = Gpu(
+                tempGpu = Gpu(
                     name = gpu.name,
                     fhdPerf = gpu.fhdPerf,
                     qhdPerf = gpu.qhdPerf,
-                    price = aux['ValorAV'],
+                    price = lowValueGpu.price,
                 )
-                if aux['ValorAV'] < gpu.lowestPrice:
-                    auxGpu.lowestPrice = aux['ValorAV']
-                    auxGpu.dateLowestPrice = SearchDate
+                tempGpu.lowestPrice = lowValueGpu.price
+                tempGpu.dateLowestPrice = SearchDate
                 
-                auxGpu.AvgHD = auxGpu.price / auxGpu.fhdPerf
-                auxGpu.AvgQHD = auxGpu.price / auxGpu.qhdPerf
-                auxGpu.link = aux['Link']
-                gpusFinalResult.append(auxGpu)
+                tempGpu.store = lowValueGpu.store
+                tempGpu.AvgHD = lowValueGpu.price / tempGpu.fhdPerf
+                tempGpu.AvgQHD = lowValueGpu.price / tempGpu.qhdPerf
+                tempGpu.link = lowValueGpu.link
+
+                gpusFinalResult.append(tempGpu)
                 break
 
-    
+
     return gpusFinalResult
 
 

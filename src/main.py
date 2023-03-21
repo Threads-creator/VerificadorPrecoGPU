@@ -6,7 +6,7 @@ import os
 
 excelFile = 'Orçamento_PC.xlsx'
 
-colunmNames = ['Nome', 'FHD performance', 'QHD performance', 'Preco', 'Menor Preco', 'Data Menor Preco', 'Avg FHD', 'Avg QHD', 'Link']
+colunmNames = ['Nome', 'Avg FHD', 'Avg QHD', 'Preco', 'Menor Preco', 'Data Menor Preco', 'Loja MP', 'CpF FHD', 'CpF QHD', 'Link']
 
 fileFounded = True
 
@@ -32,16 +32,22 @@ if fileFounded:
     for row in dataFrame.values.tolist():
         for gpu in lastPricesCheckedList:
 
-
             gpuName = row[0][row[0].find(' ') + 1::].replace(' ', '').upper()
+            
 
 
-            if gpuName.upper() == gpu['ModeloSimplificado'].replace(' ', '').upper():
+            if gpuName.upper() == gpu.name.replace(' ', '').upper():
 
                 
-                if gpu['ValorAV'] < row[4]:
-                    dataFrame.at[idx, 'Menor Preco'] = gpu['ValorAV']
+                if gpu.price < row[4]:
+                    dataFrame.at[idx, 'Menor Preco'] = gpu.price
                     dataFrame.at[idx, 'Data Menor Preco'] = GpuData.SearchDate
+                    dataFrame.at[idx, 'Loja MP'] = gpu.store
+                
+                dataFrame.at[idx, 'Preco'] = gpu.price
+                dataFrame.at[idx, 'Link'] = gpu.link
+                dataFrame.at[idx, 'CpF FHD']  = gpu.price / dataFrame.at[idx, 'Avg FHD']
+                dataFrame.at[idx, 'CpF QHD']  = gpu.price / dataFrame.at[idx, 'Avg QHD']
 
         idx += 1
 
@@ -52,8 +58,22 @@ else:
 
     dataGpus = GpuData.getGpusAllData()
 
-    dataFrame = p.DataFrame(data=[x.__dict__.values() for x in dataGpus], columns=colunmNames)
+    dataFrame = p.DataFrame();
 
+    idx = 0;
+    for gpu in dataGpus:
+        dataFrame.at[idx, colunmNames[0]] = gpu.name
+        dataFrame.at[idx, colunmNames[1]] = gpu.fhdPerf
+        dataFrame.at[idx, colunmNames[2]] = gpu.qhdPerf
+        dataFrame.at[idx, colunmNames[3]] = gpu.price
+        dataFrame.at[idx, colunmNames[4]] = gpu.lowestPrice
+        dataFrame.at[idx, colunmNames[5]] = gpu.dateLowestPrice
+        dataFrame.at[idx, colunmNames[6]] = gpu.store
+        dataFrame.at[idx, colunmNames[7]] = gpu.AvgHD
+        dataFrame.at[idx, colunmNames[8]] = gpu.AvgQHD
+        dataFrame.at[idx, colunmNames[9]] = gpu.link
+
+        idx += 1
 
     dataFrame.to_excel(excelFile, index=False, sheet_name='GPU')
 
