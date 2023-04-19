@@ -20,3 +20,11 @@ Script que pega informações de performance e preço e encontra menor valor e c
 - **CpF FHD**: custo por frame em full hd
 - **CpF QHD**: custo por frame em full qhd
 - **Link**: link do preço atual
+
+### Utilização
+
+- Clone ou baixe o repositório
+- Crie o ambiente virtual com <code>python -m venv VerificadorPrecoGPU</code>
+- Ative o ambiente: <code>.\Scripts\activate</code>
+- Baixe as dependências: <code>pip install -r requiriments.txt</code>
+- Execute o projeto: <code>python main.py</code>
