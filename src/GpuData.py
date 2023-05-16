@@ -6,6 +6,8 @@ urlPerf = "https://www.tomshardware.com/reviews/gpu-hierarchy,4388.html"
 
 class Gpu:
 
+    codName: str
+
     name: str
     fhdPerf: float
     qhdPerf: float
@@ -81,8 +83,8 @@ def getGpuPerfData():
             print(f'Não foi possivel encontrar o FPS da placa {name}')
             continue
 
-
         listGpus.append(Gpu(name, fhdPerf, qhdPerf))
+    
     
 
     return listGpus
@@ -105,22 +107,20 @@ def __normalizeGpuName(name):
     name = name[idxStart + 1 ::].strip()
 
     subNames = name.split(' ')
-    if subNames.__contains__('SUPER'):
-        return name
-    else:
-        name = subNames[0] + " "
-        for subName in subNames[1::]:
-            name += subName
-        return name
+    
+    name = subNames[0]
+    for subName in subNames[1::]:
+        name += subName
+    return name
 
 
 # definir gpus buscadas
-searchNames = [] * len(gpusFromSite)
 for gpu in gpusFromSite:
+    gpu.codName = __normalizeGpuName(gpu.name)
     
-    searchNames.append(__normalizeGpuName(gpu.name))
 
 def getGpusFromApiPrice(qtd):
+    
     try:
         response = requests.get(urlPrice)
     except:
@@ -128,18 +128,19 @@ def getGpusFromApiPrice(qtd):
         return
 
     try:
-        produtos = [] * qtd
 
+        produtos = [] * qtd
         for produto in json.loads(response.content.decode('utf-8')):
             if produto['ModeloSimplificado'] == "RTX 3060" and (produto['Modelo'].__contains__("8GB") or produto['Modelo'].__contains__("8 GB")):
                 continue
             produtos.append(produto)
+
     except:
         print(f'Não foi possivel ler os dados da Request feita a API Preços')
 
     return produtos
 
-gpusFromJson = getGpusFromApiPrice(len(searchNames))
+gpusFromJson = getGpusFromApiPrice(len(gpusFromSite))
 
 # pega data da busca
 SearchDate = gpusFromJson[0]['Modelo'].split(' ')[2]
@@ -147,18 +148,18 @@ SearchDate = gpusFromJson[0]['Modelo'].split(' ')[2]
 gpusFromJson = gpusFromJson[1::]
 
 
-def __filterGpus(gpus, nameGpus):
+def __filterGpus(gpus, namedGpus):
 
     gpusFiltered = []
     for gpu in gpus:
-        for gpuName in nameGpus:
-            if gpu['ModeloSimplificado'].__contains__(gpuName):
+        for gpuName in namedGpus:
+            if gpu['ModeloSimplificado'].replace(" ", "").__contains__(gpuName.codName):
                 gpusFiltered.append(gpu)
                 break
 
     return gpusFiltered
 
-gpusFiltered = __filterGpus(gpusFromJson, searchNames)
+gpusFiltered = __filterGpus(gpusFromJson, gpusFromSite)
         
 
 def __findGpuLowerValue(productName, products):

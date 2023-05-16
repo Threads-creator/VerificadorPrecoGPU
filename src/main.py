@@ -1,7 +1,6 @@
 import pandas as p
-from openpyxl import load_workbook
+import openpyxl
 import GpuData
-import pandas as p
 import os
 
 excelFile = 'Orçamento_PC.xlsx'
@@ -37,8 +36,7 @@ if fileFounded:
 
 
             if gpuName.upper() == gpu.name.replace(' ', '').upper():
-
-                
+              
                 if gpu.price < row[4]:
                     dataFrame.at[idx, 'Menor Preco'] = gpu.price
                     dataFrame.at[idx, 'Data Menor Preco'] = GpuData.SearchDate
@@ -88,7 +86,7 @@ import subprocess
 comand = "start excel"
 
 #precisa de shell=true para indicar uma chamada ao promp 
-subprocess.run([ "start", "excel", excelFile], shell=True)
+subprocess.run(["start", "excel", excelFile], shell=True)
 
 
 print("Terminou de executar o script pyton !")
