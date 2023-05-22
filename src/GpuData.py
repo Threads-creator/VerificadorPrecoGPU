@@ -83,6 +83,8 @@ def getGpuPerfData():
             print(f'Não foi possivel encontrar o FPS da placa {name}')
             continue
 
+        if name == "GeForce RTX 3060":
+            name = name + " 12GB"
         listGpus.append(Gpu(name, fhdPerf, qhdPerf))
     
     
@@ -131,7 +133,7 @@ def getGpusFromApiPrice(qtd):
 
         produtos = [] * qtd
         for produto in json.loads(response.content.decode('utf-8')):
-            if produto['ModeloSimplificado'] == "RTX 3060" and (produto['Modelo'].__contains__("8GB") or produto['Modelo'].__contains__("8 GB")):
+            if produto['ModeloSimplificado'].__contains__("RTX 3060 8GB"):
                 continue
             produtos.append(produto)
 
