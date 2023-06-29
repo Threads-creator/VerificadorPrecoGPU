@@ -133,3 +133,5 @@ dmypy.json
 Scripts/
 pyvenv.cfg
 /output
+.vscode/*
+.vscode/settings.json

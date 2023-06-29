@@ -1,38 +1,9 @@
 import json
 import requests
 from bs4 import BeautifulSoup
+from models.Gpu import Gpu
 
 urlPerf = "https://www.tomshardware.com/reviews/gpu-hierarchy,4388.html"
-
-class Gpu:
-
-    codName: str
-
-    name: str
-    fhdPerf: float
-    qhdPerf: float
-    
-    price: float
-    lowestPrice = 99999
-    dateLowestPrice: str
-    store: str
-    link: str
-
-    def __init__(self, name, fhdPerf = 0.0, qhdPerf = 0.0, price = 0.0, lowestPrice = 99999.0, dateLowestPrice = "", store="", link=""):
-        self.name = name
-        self.fhdPerf = fhdPerf
-        self.qhdPerf = qhdPerf
-        self.price = price
-        self.lowestPrice = lowestPrice
-        self.dateLowestPrice = dateLowestPrice
-        self.store = store
-        self.link = link
-
-
-    def __str__(self) -> str:
-        return f'{self.name} + - + {self.fhdPerf} + - + {self.qhdPerf} + - + {self.price} + - + {self.lowestPrice} + - + {self.dateLowestPrice} '
-
-
 
 
 def __getAllGpuRows(response):
@@ -136,11 +107,13 @@ def getGpusFromApiPrice(qtd):
             if produto['ModeloSimplificado'].__contains__("RTX 3060 8GB"):
                 continue
             produtos.append(produto)
+        
+        return produtos
 
     except:
         print(f'Não foi possivel ler os dados da Request feita a API Preços')
+        return
 
-    return produtos
 
 gpusFromJson = getGpusFromApiPrice(len(gpusFromSite))
 
@@ -246,8 +219,8 @@ def getGpusAllData():
                 tempGpu.dateLowestPrice = SearchDate
                 
                 tempGpu.store = lowValueGpu.store
-                tempGpu.AvgHD = lowValueGpu.price / tempGpu.fhdPerf
-                tempGpu.AvgQHD = lowValueGpu.price / tempGpu.qhdPerf
+                tempGpu.cpfHD = lowValueGpu.price / tempGpu.fhdPerf
+                tempGpu.cpfQHD = lowValueGpu.price / tempGpu.qhdPerf
                 tempGpu.link = lowValueGpu.link
 
                 gpusFinalResult.append(tempGpu)
