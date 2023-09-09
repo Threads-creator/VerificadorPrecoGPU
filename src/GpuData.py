@@ -106,6 +106,8 @@ def getGpusFromApiPrice(qtd):
         for produto in json.loads(response.content.decode('utf-8')):
             if produto['ModeloSimplificado'].__contains__("RTX 3060 8GB"):
                 continue
+            elif produto['ModeloSimplificado'].__contains__("RX 7800") or produto['ModeloSimplificado'].__contains__("RX 7700"):
+                produto['ModeloSimplificado'] = produto['ModeloSimplificado'] + " XT"
             produtos.append(produto)
         
         return produtos
