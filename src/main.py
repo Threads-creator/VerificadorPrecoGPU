@@ -3,24 +3,39 @@ import openpyxl
 import GpuData
 import models.Gpu
 import os
+import json
 
 
 colunmNames = ['Nome', 'Avg FHD', 'Avg QHD', 'Preco', 'Menor Preco', 'Data Menor Preco', 'Loja MP', 'CpF FHD', 'CpF QHD', 'Link']
 
 def main():
 
-
+    configFile = 'config.json'
     excelFile = 'Orçamento_PC.xlsx'
 
     fileFounded = True
+    configParams = {
+        'showConsole': 'true',
+        'openExcel':  'true'
+    }
 
     excelFile = os.getcwd() + '/' + excelFile
+    configFile = os.getcwd() + '/' + configFile
 
     try:
         if os.path.isfile(excelFile):
             fileFounded = True
         else: 
             fileFounded = False
+        
+        if not os.path.isfile(configFile):
+            newConfigFile = open(configFile, 'a')
+            newConfigFile.write(json.dumps(configParams))
+            newConfigFile.close()
+
+        with open(configFile, 'r') as f:
+            configParams = json.load(f)
+            
     except:
         print("Arquivo nao encontrado !! criando um arquivo novo")
         fileFounded = False
@@ -53,6 +68,7 @@ def main():
 
 
     print(dataFrame)
+    print(configParams)
 
     # Abrindo outro progrma pelo python 
 
@@ -61,12 +77,13 @@ def main():
 
     comand = "start excel"
 
+    if configParams['openExcel'].__eq__('true'):
     #precisa de shell=true para indicar uma chamada ao promp 
-    subprocess.run(["start", "excel", excelFile], shell=True)
+        subprocess.run(["start", "excel", excelFile], shell=True)
 
-
-    print("Terminou de executar o script pyton !")
-    input("Digite algo para continuar !")
+    if configParams['showConsole'].__eq__('true'):
+        print("Terminou de executar o script pyton !")
+        input("Digite algo para continuar !")
 
 
 def createFirstDataFrame():
