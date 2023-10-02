@@ -56,6 +56,8 @@ def getGpuPerfData():
 
         if name == "GeForce RTX 3060":
             name = name + " 12GB"
+        elif name == "GeForce RTX 4060 Ti":
+            name = name + " 8GB"
         listGpus.append(Gpu(name, fhdPerf, qhdPerf))
     
     
