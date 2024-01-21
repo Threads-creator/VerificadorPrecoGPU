@@ -14,6 +14,25 @@ def __getAllGpuRows(response):
 
     return tableBody.find_all(class_='table__body__row')
 
+def __getHeader(response):
+    soup = BeautifulSoup(response.content, features='html.parser')
+
+    return soup.find(class_="table__head__row")
+
+def __getFpsColumnsIdx(header):
+    idx = 0
+    fhdIdx, qhdIdx = 0, 0
+
+    for th in header.find_all('th'):
+        if th.text == '1080p Ultra':
+            fhdIdx = idx
+        elif th.text == '1440p Ultra':
+            qhdIdx = idx
+        
+        idx += 1
+
+    return [fhdIdx, qhdIdx]
+
 def __getFps(tdRow):
 
     start = tdRow.find("(")
@@ -35,6 +54,9 @@ def getGpuPerfData():
 
 
     rows = __getAllGpuRows(response)
+    header = __getHeader(response)
+
+    fhdIdx, qhdIdx = __getFpsColumnsIdx(header)
 
     listGpus = [] * len(rows)
 
@@ -46,8 +68,8 @@ def getGpuPerfData():
 
         try:
 
-            fhdPerf = __getFps(str(tableTd[1]))
-            qhdPerf = __getFps(str(tableTd[3]))
+            fhdPerf = __getFps(str(tableTd[fhdIdx]))
+            qhdPerf = __getFps(str(tableTd[qhdIdx]))
         
         except:
 

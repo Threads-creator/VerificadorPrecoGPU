@@ -135,3 +135,5 @@ pyvenv.cfg
 /output
 .vscode/*
 .vscode/settings.json
+
+config.json
