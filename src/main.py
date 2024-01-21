@@ -85,6 +85,8 @@ def main():
         print("Terminou de executar o script pyton !")
         input("Digite algo para continuar !")
 
+def make_hyperlink(value):
+    return '=HYPERLINK("%s", "%s")' % (value, value)
 
 def createFirstDataFrame():
     dataGpus = GpuData.getGpusAllData()
@@ -102,7 +104,7 @@ def createFirstDataFrame():
         dataFrame.at[idx, colunmNames[6]] = gpu.store
         dataFrame.at[idx, colunmNames[7]] = gpu.cpfHD
         dataFrame.at[idx, colunmNames[8]] = gpu.cpfQHD
-        dataFrame.at[idx, colunmNames[9]] = gpu.link
+        dataFrame.at[idx, colunmNames[9]] = make_hyperlink(gpu.link)
 
         idx += 1
 
@@ -124,7 +126,7 @@ def updateOnlyPriceInDataFrame(dataFrame, lastPricesChecked):
                     dataFrame.at[idx, 'Loja MP'] = gpu.store
                 
                 dataFrame.at[idx, 'Preco'] = gpu.price
-                dataFrame.at[idx, 'Link'] = gpu.link
+                dataFrame.at[idx, 'Link'] = make_hyperlink(gpu.link)
                 dataFrame.at[idx, 'CpF FHD']  = gpu.price / dataFrame.at[idx, 'Avg FHD']
                 dataFrame.at[idx, 'CpF QHD']  = gpu.price / dataFrame.at[idx, 'Avg QHD']
 
@@ -160,7 +162,7 @@ def updateAllGpuDataInDataFrame(dataFrame):
         newDataFrame.at[idx, colunmNames[6]] = gpu.store
         newDataFrame.at[idx, colunmNames[7]] = gpu.cpfHD
         newDataFrame.at[idx, colunmNames[8]] = gpu.cpfQHD
-        newDataFrame.at[idx, colunmNames[9]] = gpu.link
+        newDataFrame.at[idx, colunmNames[9]] = make_hyperlink(gpu.link)
         idx += 1
     
     newDataFrame.sort_values(by=['Nome'])
