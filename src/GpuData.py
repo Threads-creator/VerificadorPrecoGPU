@@ -82,8 +82,6 @@ def getGpuPerfData():
             name = name + " 8GB"
         listGpus.append(Gpu(name, fhdPerf, qhdPerf))
     
-    
-
     return listGpus
 
 
@@ -160,7 +158,6 @@ def __filterGpus(gpus, namedGpus):
             if gpu['ModeloSimplificado'].replace(" ", "").__contains__(gpuName.codName):
                 gpusFiltered.append(gpu)
                 break
-
     return gpusFiltered
 
 gpusFiltered = __filterGpus(gpusFromJson, gpusFromSite)
@@ -171,10 +168,14 @@ def __findGpuLowerValue(productName, products):
     productLowerValue = {}
     
     for product in products:
-        if product['ModeloSimplificado'].upper() == productName.upper():
-            if lowerValue > product['ValorAV']:
-                lowerValue = product['ValorAV']
-                productLowerValue = product
+        try:
+            if product['ModeloSimplificado'].upper() == productName.upper():
+                if lowerValue > product['ValorAV']:
+                    lowerValue = product['ValorAV']
+                    productLowerValue = product
+        except:
+            continue
+            
     
     return productLowerValue
 
@@ -209,7 +210,7 @@ def __convertJsonToGpuClass(gpus):
 
     for gpu in gpus:
         tempGpu = Gpu(name = gpu["ModeloSimplificado"])
-        tempGpu.price=gpu["ValorAV"]
+        tempGpu.price = gpu["ValorAV"]
         tempGpu.store = gpu["Loja"]
         tempGpu.link = gpu["Link"]
 
