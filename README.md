@@ -11,15 +11,17 @@ Script que pega informações de performance e preço e encontra menor valor e c
 ### Propriedades da tabela
 
 - **Nome**: modelo da GPU
-- **Avg FHD**: média performance em full hd
-- **Avg QHD**: média performance em full qhd
+- **Avg FHD**: performance média em Full HD
+- **Avg QHD**: performance média em QHD
+- **Avg 4K**: performance média em 4K
 - **Preco**: preço atual da GPU
 - **Menor Preco**: menor preço ja registrado
 - **Data Menor Preco**: data do menor preço ja registrado
 - **Loja MP**: loja do menor preço histórico
-- **CpF FHD**: custo por frame em full hd
-- **CpF QHD**: custo por frame em full qhd
-- **Link**: link do preço atual
+- **CpF FHD**: custo por frame em Full HD
+- **CpF QHD**: custo por frame em QHD
+- **CpF 4K**: custo por frame em 4K
+- **Link**: link da loja com preço atual
 
 ### Utilização
 
