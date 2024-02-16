@@ -6,14 +6,16 @@ import os
 import json
 
 
-colunmNames = ['Nome', 'Avg FHD', 'Avg QHD', 'Preco', 'Menor Preco', 'Data Menor Preco', 'Loja MP', 'CpF FHD', 'CpF QHD', 'Link']
+colunmNames = ['Nome', 'Avg FHD', 'Avg QHD', 'Preco', 'Menor Preco', 'Data Menor Preco', 'Loja MP', 'CpF FHD', 'CpF QHD', 'Link', 'Avg 4K', 'CpF 4K']
 
 def main():
+
 
     configFile = 'config.json'
     excelFile = 'Orçamento_PC.xlsx'
 
     fileFounded = True
+
     configParams = {
         'showConsole': 'true',
         'openExcel':  'true'
@@ -39,17 +41,14 @@ def main():
     except:
         print("Arquivo nao encontrado !! criando um arquivo novo")
         fileFounded = False
-
-
+    
     if fileFounded:
 
         dataFrame = p.read_excel(io=excelFile, sheet_name='GPU')
 
         lastPricesCheckedList = GpuData.getGpusPrice()
 
-        
-
-        if dataFrame["Nome"].values.size < len(lastPricesCheckedList):
+        if dataFrame["Nome"].values.size < len(lastPricesCheckedList) or "CpF 4K" not in dataFrame or "Avg 4K" not in dataFrame:
 
             dataFrame = updateAllGpuDataInDataFrame(dataFrame)
 
@@ -98,12 +97,14 @@ def createFirstDataFrame():
         dataFrame.at[idx, colunmNames[0]] = gpu.name
         dataFrame.at[idx, colunmNames[1]] = gpu.fhdPerf
         dataFrame.at[idx, colunmNames[2]] = gpu.qhdPerf
+        dataFrame.at[idx, colunmNames[10]] = gpu.fourkPerf
         dataFrame.at[idx, colunmNames[3]] = gpu.price
         dataFrame.at[idx, colunmNames[4]] = gpu.lowestPrice
         dataFrame.at[idx, colunmNames[5]] = gpu.dateLowestPrice
         dataFrame.at[idx, colunmNames[6]] = gpu.store
         dataFrame.at[idx, colunmNames[7]] = gpu.cpfHD
         dataFrame.at[idx, colunmNames[8]] = gpu.cpfQHD
+        dataFrame.at[idx, colunmNames[11]] = gpu.cpf4K
         dataFrame.at[idx, colunmNames[9]] = make_hyperlink(gpu.link)
 
         idx += 1
@@ -120,15 +121,16 @@ def updateOnlyPriceInDataFrame(dataFrame, lastPricesChecked):
             
             if gpuName.upper() == gpu.name.replace(' ', '').upper():
               
-                if gpu.price < row[4]:
+                if gpu.price < row[5]:
                     dataFrame.at[idx, 'Menor Preco'] = gpu.price
                     dataFrame.at[idx, 'Data Menor Preco'] = GpuData.SearchDate
                     dataFrame.at[idx, 'Loja MP'] = gpu.store
                 
                 dataFrame.at[idx, 'Preco'] = gpu.price
                 dataFrame.at[idx, 'Link'] = make_hyperlink(gpu.link)
-                dataFrame.at[idx, 'CpF FHD']  = gpu.price / dataFrame.at[idx, 'Avg FHD']
-                dataFrame.at[idx, 'CpF QHD']  = gpu.price / dataFrame.at[idx, 'Avg QHD']
+                dataFrame.at[idx, 'CpF FHD'] = 0.0 if dataFrame.at[idx, 'Avg FHD'] == 0 else gpu.price / dataFrame.at[idx, 'Avg FHD']
+                dataFrame.at[idx, 'CpF QHD'] = 0.0 if dataFrame.at[idx, 'Avg QHD'] == 0 else gpu.price / dataFrame.at[idx, 'Avg QHD']
+                dataFrame.at[idx, 'CpF 4K'] = 0.0 if dataFrame.at[idx, 'Avg 4K'] == 0 else gpu.price / dataFrame.at[idx, 'Avg 4K']
 
         idx += 1
     
@@ -156,12 +158,14 @@ def updateAllGpuDataInDataFrame(dataFrame):
         newDataFrame.at[idx, colunmNames[0]] = gpu.name
         newDataFrame.at[idx, colunmNames[1]] = gpu.fhdPerf
         newDataFrame.at[idx, colunmNames[2]] = gpu.qhdPerf
+        newDataFrame.at[idx, colunmNames[10]] = gpu.fourkPerf
         newDataFrame.at[idx, colunmNames[3]] = gpu.price
         newDataFrame.at[idx, colunmNames[4]] = gpu.lowestPrice
         newDataFrame.at[idx, colunmNames[5]] = gpu.dateLowestPrice
         newDataFrame.at[idx, colunmNames[6]] = gpu.store
         newDataFrame.at[idx, colunmNames[7]] = gpu.cpfHD
         newDataFrame.at[idx, colunmNames[8]] = gpu.cpfQHD
+        newDataFrame.at[idx, colunmNames[11]] = gpu.cpf4K
         newDataFrame.at[idx, colunmNames[9]] = make_hyperlink(gpu.link)
         idx += 1
     

@@ -5,16 +5,20 @@ class Gpu:
     def __init__(self, 
                 name: str, 
                 fhdPerf = 0.0, 
-                qhdPerf = 0.0, 
+                qhdPerf = 0.0,
+                fourkPerf = 0.0, 
                 price = 0.0, 
-                lowestPrice = 99999.0, dateLowestPrice = "", 
+                lowestPrice = 99999.0, 
+                dateLowestPrice = "", 
                 store = "", 
                 link = "",
                 cpfHD =0.0,
-                cpfQHD = 0.0):
+                cpfQHD = 0.0,
+                cpf4K = 0.0):
         self.name = name
         self.fhdPerf = fhdPerf
         self.qhdPerf = qhdPerf
+        self.fourkPerf = fourkPerf
         self.price = price
         self.lowestPrice = lowestPrice
         self.dateLowestPrice = dateLowestPrice
@@ -22,6 +26,7 @@ class Gpu:
         self.link = link
         self.cpfHD = cpfHD
         self.cpfQHD = cpfQHD
+        self.cpf4K = cpf4K
 
         @property
         def name(self):
@@ -48,6 +53,14 @@ class Gpu:
         @qhdPerf.setter
         def qhdPerf(self, qhdPerf):
             self._qhdPerf = qhdPerf;
+        
+        @property
+        def fourkPerf(self):
+            return self._fourkPerf;
+
+        @fourkPerf.setter
+        def fourkPerf(self, fourkPerf):
+            self._fourkPerf = fourkPerf;
 
         @property
         def price(self):
@@ -102,10 +115,18 @@ class Gpu:
             return self._cpfQHD
         
         @cpfQHD.setter
-        def cpfcpfQHD(self, cpfQHD):
+        def cpfQHD(self, cpfQHD):
             self._cpfQHD = cpfQHD;
+
+        @property
+        def cpf4K(self):
+            return self._cpf4K
+        
+        @cpf4K.setter
+        def cpf4K(self, cpf4K):
+            self._cpf4K = cpf4K;
 
 
     def __str__(self) -> str:
-        return f'{self.name} + - + {self.fhdPerf} + - + {self.qhdPerf} + - + {self.price} + - + {self.lowestPrice} + - + {self.dateLowestPrice} '
+        return f'{self.name} + - + {self.fhdPerf} + - + {self.qhdPerf} + - + {self.fourkPerf} + - + {self.price} + - + {self.lowestPrice} + - + {self.dateLowestPrice} '
 

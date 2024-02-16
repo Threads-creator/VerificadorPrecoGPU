@@ -13,11 +13,12 @@ from GpuData import getGpusAllData
 #     test_getGpusFromApiPrice()
 
 def test_gpuClass():
-    gpu = Gpu("RTX 3060 12GB", 68.2, 55.4, 1800.00)
+    gpu = Gpu("RTX 3060 12GB", 68.2, 55.4, 34.6, 1800.00)
 
     assert gpu.name == "RTX 3060 12GB"
     assert gpu.fhdPerf == 68.2
     assert gpu.qhdPerf == 55.4
+    assert gpu.fourkPerf == 34.6
     assert gpu.price == 1800.0
     assert gpu.link == ""
     assert gpu.store == ""

@@ -5,7 +5,6 @@ from models.Gpu import Gpu
 
 urlPerf = "https://www.tomshardware.com/reviews/gpu-hierarchy,4388.html"
 
-
 def __getAllGpuRows(response):
 
     soup = BeautifulSoup(response.content, features='html.parser')
@@ -21,17 +20,19 @@ def __getHeader(response):
 
 def __getFpsColumnsIdx(header):
     idx = 0
-    fhdIdx, qhdIdx = 0, 0
+    fhdIdx, qhdIdx, fourkIdx = 0, 0, 0
 
     for th in header.find_all('th'):
         if th.text == '1080p Ultra':
             fhdIdx = idx
         elif th.text == '1440p Ultra':
             qhdIdx = idx
+        elif th.text == '4K Ultra':
+            fourkIdx = idx
         
         idx += 1
 
-    return [fhdIdx, qhdIdx]
+    return [fhdIdx, qhdIdx, fourkIdx]
 
 def __getFps(tdRow):
 
@@ -56,7 +57,7 @@ def getGpuPerfData():
     rows = __getAllGpuRows(response)
     header = __getHeader(response)
 
-    fhdIdx, qhdIdx = __getFpsColumnsIdx(header)
+    fhdIdx, qhdIdx, fourkIdx = __getFpsColumnsIdx(header)
 
     listGpus = [] * len(rows)
 
@@ -70,6 +71,10 @@ def getGpuPerfData():
 
             fhdPerf = __getFps(str(tableTd[fhdIdx]))
             qhdPerf = __getFps(str(tableTd[qhdIdx]))
+            try:
+                fourkPerf = __getFps(str(tableTd[fourkIdx]))
+            except:
+                fourkPerf = 0.0
         
         except:
 
@@ -80,7 +85,7 @@ def getGpuPerfData():
             name = name + " 12GB"
         elif name == "GeForce RTX 4060 Ti":
             name = name + " 8GB"
-        listGpus.append(Gpu(name, fhdPerf, qhdPerf))
+        listGpus.append(Gpu(name, fhdPerf, qhdPerf, fourkPerf))
     
     return listGpus
 
@@ -88,10 +93,16 @@ def getGpuPerfData():
 
 
 
+baseUrlPrice = "https://placasdevideo.app.br/precos"
 
+def __getUrlsPrice():
+    endpointsPrices = ['firstRow', 'Amazon', 'AlligatorShop', 'Enifler', 'FGTec', 'Gigantec', 'GuerraDigital', 'GKInfoStore', 'Inpower', 'ItxGamer', 'Kabum', 'Magalu', 'MercadoLivre', 'Patoloco', 'Pichau', 'Terabyte', 'Waz']
 
-urlPrice = "https://placasdevideo.app.br/Precos.json"
+    urlsPrices = [];
+    for endpoint in endpointsPrices:
+        urlsPrices.append(f'{baseUrlPrice}/{endpoint}.json')
 
+    return urlsPrices
 
 gpusFromSite = getGpuPerfData()
 
@@ -115,32 +126,31 @@ for gpu in gpusFromSite:
     
 
 def getGpusFromApiPrice(qtd):
+
+    produtos = [] * qtd
     
-    try:
-        response = requests.get(urlPrice)
-    except:
-        print(f'Não foi possivel acessar a API de preços')
-        return
+    for url in __getUrlsPrice():
+        try:
+            response = requests.get(url)
+        except:
+            print(f'Não foi possivel acessar a API de preços com url: {url}')
+            continue
 
-    try:
+        try:
+            for produto in json.loads(response.content.decode('utf-8')):
+                if produto['ModeloSimplificado'].__contains__("RTX 3060 8GB"):
+                    continue
+                elif produto['ModeloSimplificado'].__contains__("RX 7800"):
+                    produto['ModeloSimplificado'] = "RX 7800 XT"
+                elif produto['ModeloSimplificado'].__contains__("RX 7700"):
+                    produto['ModeloSimplificado'] = "RX 7700 XT"
 
-        produtos = [] * qtd
-        for produto in json.loads(response.content.decode('utf-8')):
-            if produto['ModeloSimplificado'].__contains__("RTX 3060 8GB"):
-                continue
-            elif produto['ModeloSimplificado'].__contains__("RX 7800"):
-                produto['ModeloSimplificado'] = "RX 7800 XT"
-            elif produto['ModeloSimplificado'].__contains__("RX 7700"):
-                produto['ModeloSimplificado'] = "RX 7700 XT"
-
-            produtos.append(produto)
+                produtos.append(produto)
+        except:
+            print(f'Não foi possivel ler os dados da Request com url: {url}')
+            return
         
-        return produtos
-
-    except:
-        print(f'Não foi possivel ler os dados da Request feita a API Preços')
-        return
-
+    return produtos
 
 gpusFromJson = getGpusFromApiPrice(len(gpusFromSite))
 
@@ -243,14 +253,16 @@ def getGpusAllData():
                     name = gpu.name,
                     fhdPerf = gpu.fhdPerf,
                     qhdPerf = gpu.qhdPerf,
+                    fourkPerf = gpu.fourkPerf,
                     price = lowValueGpu.price,
                 )
                 tempGpu.lowestPrice = lowValueGpu.price
                 tempGpu.dateLowestPrice = SearchDate
                 
                 tempGpu.store = lowValueGpu.store
-                tempGpu.cpfHD = lowValueGpu.price / tempGpu.fhdPerf
-                tempGpu.cpfQHD = lowValueGpu.price / tempGpu.qhdPerf
+                tempGpu.cpfHD = 0 if tempGpu.fhdPerf == 0 else lowValueGpu.price / tempGpu.fhdPerf
+                tempGpu.cpfQHD = 0 if tempGpu.qhdPerf == 0 else lowValueGpu.price / tempGpu.qhdPerf
+                tempGpu.cpf4K = 0 if tempGpu.fourkPerf == 0 else lowValueGpu.price / tempGpu.fourkPerf
                 tempGpu.link = lowValueGpu.link
 
                 gpusFinalResult.append(tempGpu)
